@@ -13,12 +13,14 @@ import (
 
 var db gorm.DB
 
+// ユーザモデル
 type User struct {
 	ID       int `gorm:"primary_key"`
 	UserName string
 }
 type Users []User
 
+// 残高モデル
 type Remainder struct {
 	ID        int `gorm:"primary_key"`
 	UserID    int
@@ -27,6 +29,7 @@ type Remainder struct {
 }
 type Remainders []Remainder
 
+// 商品モデル
 type Commodity struct {
 	ID        int
 	Name      string
@@ -38,6 +41,7 @@ type Commodity struct {
 }
 type Commodities []Commodity
 
+// HTTPレスポンス用
 type basicResponseJSON struct {
 	Code    int
 	Message string
@@ -71,12 +75,18 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
+	/*
+	 * ユーザ
+	 */
 	users := e.Group("/user")
+	// ユーザ一覧
 	users.GET("/", func(c echo.Context) error {
 		mulusers := new(Users)
 		db.Find(&mulusers)
 		return c.JSON(http.StatusOK, mulusers)
 	})
+
+	// useridのユーザ情報の取得
 	users.GET("/:userid", func(c echo.Context) error {
 		userid, _ := strconv.Atoi(c.Param("userid"))
 		user := new(User)
@@ -87,6 +97,8 @@ func main() {
 		}
 		return c.JSON(http.StatusOK, user)
 	})
+
+	// ユーザ追加
 	users.POST("/add", func(c echo.Context) error {
 		user := new(User)
 		if err := c.Bind(user); err != nil {
@@ -100,6 +112,8 @@ func main() {
 		db.Create(&rem)
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
+
+	// ユーザ情報更新
 	users.POST("/update", func(c echo.Context) error {
 		newUserData := new(User)
 		if err := c.Bind(newUserData); err != nil {
@@ -108,6 +122,8 @@ func main() {
 		db.Model(&user).Where("id = ?", newUserData.ID).Update(newUserData)
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
+
+	// ユーザ削除
 	users.POST("/delete", func(c echo.Context) error {
 		userid, _ := strconv.Atoi(c.FormValue("ID"))
 		db.Where("id = ?", userid).Delete(&User{})
@@ -115,19 +131,27 @@ func main() {
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
 
+	/*
+	 * 残高
+	 */
 	remainder := e.Group("/remainder")
+	// useridの残高参照
 	remainder.GET("/:userid", func(c echo.Context) error {
 		userid, _ := strconv.Atoi(c.Param("userid"))
 		rem := new(Remainder)
 		db.Where("user_id = ?", userid).Last(&rem)
 		return c.JSON(http.StatusOK, rem)
 	})
+
+	// ユーザの残高の履歴参照
 	remainder.GET("/:userid/all", func(c echo.Context) error {
 		userid, _ := strconv.Atoi(c.Param("userid"))
 		rems := new(Remainders)
 		db.Where("user_id = ?", userid).Find(&rems)
 		return c.JSON(http.StatusOK, rems)
 	})
+
+	// 残高チャージ
 	remainder.POST("/:userid/charge", func(c echo.Context) error {
 		userid, _ := strconv.Atoi(c.Param("userid"))
 		price, _ := strconv.Atoi(c.FormValue("price"))
@@ -140,6 +164,8 @@ func main() {
 		db.Create(&rem)
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
+
+	// 残高引き出し
 	remainder.POST("/:userid/withdraw", func(c echo.Context) error {
 		userid, _ := strconv.Atoi(c.Param("userid"))
 		price, _ := strconv.Atoi(c.FormValue("price"))
@@ -156,12 +182,18 @@ func main() {
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
 
+	/*
+	 * 商品
+	 */
 	commodity := e.Group("/commodity")
+	// 全商品取得
 	commodity.GET("/", func(c echo.Context) error {
 		coms := new(Commodities)
 		db.Find(&coms)
 		return c.JSON(http.StatusOK, coms)
 	})
+
+	// 新商品追加
 	commodity.POST("/add", func(c echo.Context) error {
 		com := new(Commodity)
 		if err := c.Bind(com); err != nil {
@@ -171,11 +203,15 @@ func main() {
 		db.Create(&com)
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
+
+	// 商品削除
 	commodity.POST("/delte", func(c echo.Context) error {
 		comid, _ := strconv.Atoi(c.FormValue("ID"))
 		db.Where("id = ?", comid).Delete(&Commodity{})
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
+
+	// 商品購入
 	commodity.POST("/buy", func(c echo.Context) error {
 		// Fetch commodity data
 		com := new(Commodity)
