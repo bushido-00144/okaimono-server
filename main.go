@@ -33,7 +33,7 @@ type Remainders []Remainder
 type Commodity struct {
 	ID        int
 	Name      string
-	JANCode   string
+	JANCode   string `gorm:"unique"`
 	Price     int
 	Stock     int
 	CreatedAt time.Time
@@ -199,8 +199,16 @@ func main() {
 		if err := c.Bind(com); err != nil {
 			return c.JSON(http.StatusOK, basicResponseJSON{Code: 300, Message: "Faild Binding posted data"})
 		}
+		addedCom := new(Commodity)
+		db.Where("jan_code = ?", com.JANCode).First(&addedCom)
+		if addedCom.ID != 0 {
+			db.Model(&addedCom).Where("jan_code = ?", com.JANCode).Update("stock", addedCom.Stock+com.Stock)
+			return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
+		}
 		db.NewRecord(com)
-		db.Create(&com)
+		if err := db.Create(&com).Error; err != nil {
+			return c.JSON(http.StatusOK, basicResponseJSON{Code: 500, Message: "Database Error"})
+		}
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
 
