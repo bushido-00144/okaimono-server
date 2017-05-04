@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }).then(()=>{
         document.getElementById('user-name').innerHTML = user.userName;
         document.getElementById('user-remainder').innerHTML = user.remainder;
-        document.getElementById('userprof-button').addEventListener('click', ()=>{
+
+        document.getElementById('user-setting-button').addEventListener('click', ()=>{
+            vex.dialog.alert('TODO: fix user setting');
         });
     });
 })

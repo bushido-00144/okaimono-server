@@ -9,16 +9,18 @@
         <link rel="stylesheet" href="static/stylesheets/skyblue.min.css">
         <link rel="stylesheet" href="static/stylesheets/vex.css">
         <link rel="stylesheet" href="static/stylesheets/vex-theme-os.css">
+        <link rel="stylesheet" href="static/stylesheets/stylesheet.css">
     </head>
     <body>
-        <header class="header">
-            <div class="col md-8">
+        <header>
+            <div class="header col md-8">
                 <a href="/"><h2>Top</h2></a>
             </div>
-            <div class="col md-4">
-                <h5 id="user-name"></h5>
-                <h5 id="user-remainder"></h5>
-                <button id="userprof-button">User</button>
+            <div class="header col md-4">
+                <h4 id="user-name" class="inline-block color-light text-middle"></h4>
+                <h4 class="inline-block color-light text-middle"> 残高:￥</h4>
+                <h4 id="user-remainder" class="inline-block color-light text-middle"></h4>
+                <button id="user-setting-button" class="btn btn-success">設定</button>
             </div>
         </header>
     </body>
