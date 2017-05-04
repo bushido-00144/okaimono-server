@@ -3,8 +3,23 @@
     <head>
         <meta charset="UTF-8">
         <title>Okaimono-server</title>
+        <script type="text/javascript" src="static/javascripts/vex.combined.min.js"></script>
+        <script>vex.defaultOptions.className = 'vex-theme-os';</script>
+        <script type="text/javascript" src="static/javascripts/main.js"></script>
+        <link rel="stylesheet" href="static/stylesheets/skyblue.min.css">
+        <link rel="stylesheet" href="static/stylesheets/vex.css">
+        <link rel="stylesheet" href="static/stylesheets/vex-theme-os.css">
     </head>
     <body>
-        Hello, world.
+        <header class="header">
+            <div class="col md-8">
+                <a href="/"><h2>Top</h2></a>
+            </div>
+            <div class="col md-4">
+                <h5 id="user-name"></h5>
+                <h5 id="user-remainder"></h5>
+                <button id="userprof-button">User</button>
+            </div>
+        </header>
     </body>
 </html>
