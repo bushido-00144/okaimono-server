@@ -23,6 +23,18 @@ class User {
     }
 }
 
+let postJSON = (url, data)=>{
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then((res)=>{
+        return res.json();
+    });
+}
 
 // DOM Loaded
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -34,7 +46,22 @@ document.addEventListener('DOMContentLoaded', ()=>{
         document.getElementById('user-remainder').innerHTML = user.remainder;
 
         document.getElementById('user-setting-button').addEventListener('click', ()=>{
-            vex.dialog.alert('TODO: fix user setting');
+            // 残高チャージ
+            vex.dialog.prompt({
+                message: '残高をチャージします',
+                placeholder: '金額を入力してください',
+                callback: (value)=>{
+                    let amount = Number(value);
+                    if(isNaN(amount)) {
+                        console.log('Invalid value');
+                        return;
+                    }
+                    postJSON('/remainder/charge', {Remainder: amount, UserID: user.userId})
+                    .then((data)=>{
+                        console.log(data);
+                    });
+                }
+            });
         });
     });
 })

@@ -94,7 +94,6 @@ func main() {
 		userid, _ := strconv.Atoi(c.Param("userid"))
 		user := new(User)
 		db.Where("id = ?", userid).First(&user)
-		fmt.Println(user)
 		if user.ID == 0 {
 			return c.JSON(http.StatusOK, basicResponseJSON{Code: 301, Message: "Not Found."})
 		}
@@ -155,16 +154,18 @@ func main() {
 	})
 
 	// 残高チャージ
-	remainder.POST("/:userid/charge", func(c echo.Context) error {
-		userid, _ := strconv.Atoi(c.Param("userid"))
-		price, _ := strconv.Atoi(c.FormValue("price"))
-		lastRem := new(Remainder)
-		db.Where("user_id = ?", userid).Last(&lastRem)
+	remainder.POST("/charge", func(c echo.Context) error {
 		rem := new(Remainder)
-		rem.UserID = userid
-		rem.Remainder = lastRem.Remainder + price
-		db.NewRecord(rem)
-		db.Create(&rem)
+		if err = c.Bind(rem); err != nil {
+			return c.JSON(http.StatusOK, basicResponseJSON{Code: 300, Message: "Can't bind data"})
+		}
+		lastRem := new(Remainder)
+		db.Where("user_id = ?", rem.UserID).Last(&lastRem)
+		newRem := new(Remainder)
+		newRem.UserID = rem.UserID
+		newRem.Remainder = lastRem.Remainder + rem.Remainder
+		db.NewRecord(newRem)
+		db.Create(&newRem)
 		return c.JSON(http.StatusOK, basicResponseJSON{Code: 200, Message: "OK"})
 	})
 
